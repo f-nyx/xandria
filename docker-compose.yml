@@ -1,0 +1,22 @@
+version: '3'
+services:
+  patobot:
+    image: seykron/xandria:1.0.0-SNAPSHOT
+    restart: unless-stopped
+    depends_on:
+      - h2
+    tmpfs:
+      - /tmp
+    environment:
+      - telegram_access_token
+      - db_url
+      - db_driver
+      - db_user
+      - db_password
+      - app_service_url
+      - app_scan_enabled
+  h2:
+    image: "oscarfonts/h2"
+    restart: unless-stopped
+    volumes:
+      - ./patobot-db/patobot:/opt/h2-data:rw
