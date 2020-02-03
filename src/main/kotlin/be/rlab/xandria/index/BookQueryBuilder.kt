@@ -94,6 +94,11 @@ class BookQueryBuilder(
         return this
     }
 
+    fun parse(query: String): BookQueryBuilder {
+        queryBuilder.parse(FIELD_TITLE, query)
+        return this
+    }
+
     /** Builds the Lucene query.
      * @return a valid Lucene query.
      */

@@ -24,7 +24,7 @@ class BookSearch(
     @InlineQueryHandler
     fun search(inlineQuery: InlineQuery): InlineQueryResponse {
         val booksResult = bookService.search(Language.SPANISH, inlineQuery.offset, BOOKS_LIMIT) {
-            title(inlineQuery.query)
+            parse(inlineQuery.query)
         }
         val results = booksResult.books.toList().map { book ->
             val thumbUrl: String? = if (book.cover) {
