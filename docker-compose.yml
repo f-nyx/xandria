@@ -1,6 +1,6 @@
 version: '3'
 services:
-  patobot:
+  xandria:
     image: seykron/xandria:1.0.0-SNAPSHOT
     restart: unless-stopped
     depends_on:
@@ -13,10 +13,13 @@ services:
       - db_driver
       - db_user
       - db_password
+      - app_index_dir
+      - app_library_location
+      - app_working_dir
       - app_service_url
       - app_scan_enabled
   h2:
     image: "oscarfonts/h2"
     restart: unless-stopped
     volumes:
-      - ./patobot-db/patobot:/opt/h2-data:rw
+      - ./xandria-db/xandria:/opt/h2-data:rw
