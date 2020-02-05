@@ -4,9 +4,13 @@ import be.rlab.nlp.model.Language
 import be.rlab.xandria.domain.model.Author
 import be.rlab.xandria.domain.model.Book
 import be.rlab.xandria.index.model.ScanResult
+import be.rlab.xandria.store.StoreBackend
 import org.joda.time.DateTime
+import org.springframework.core.io.Resource
 import org.w3c.dom.Document
 import java.io.File
+import java.net.URLDecoder
+import java.nio.charset.Charset
 import org.joox.JOOX.`$` as J
 
 /** Scans a directory to search for books.
@@ -15,7 +19,7 @@ import org.joox.JOOX.`$` as J
  */
 class BookScanner(
     /** Directory to search for books. */
-    private val libraryDir: File,
+    private val store: StoreBackend,
     /** Directory to save scanner data. */
     workingDir: File
 ) {
@@ -25,7 +29,6 @@ class BookScanner(
     }
 
     init {
-        require(libraryDir.exists()) { "the library directory must exist "}
         require(workingDir.exists()) { "the working directory must exist " }
     }
 
@@ -50,18 +53,18 @@ class BookScanner(
     fun scan(accept: (String) -> Boolean): Sequence<ScanResult> {
         createOpfCacheIfRequired()
 
-        val files: Iterator<String> = opfCache.readLines().iterator()
+        val resources: Iterator<String> = opfCache.readLines().iterator()
 
         return generateSequence {
-            if (files.hasNext()) {
-                var nextResource: String = files.next()
+            if (resources.hasNext()) {
+                var nextResource: String = resources.next()
 
-                while (!accept(nextResource) && files.hasNext()) {
-                    nextResource = files.next()
+                while (!accept(nextResource) && resources.hasNext()) {
+                    nextResource = resources.next()
                 }
 
                 if (accept(nextResource)) {
-                    val book = readMetadata(File(nextResource))
+                    val book = readMetadata(store.read(nextResource))
 
                     ScanResult.new(
                         resource = nextResource,
@@ -77,8 +80,8 @@ class BookScanner(
         }
     }
 
-    private fun readMetadata(opfFile: File): Book {
-        val doc: Document = J(opfFile.readText()).document()
+    private fun readMetadata(opfResource: Resource): Book {
+        val doc: Document = J(opfResource.inputStream).document()
         val authorName: String = J(doc).find("creator").text()
         val language: String = J(doc).find("language").text()
 
@@ -96,19 +99,15 @@ class BookScanner(
             categories = J(doc).find("subject").map { categoryEl ->
                 J(categoryEl).text()
             },
-            location = opfFile.absolutePath
-                .substringAfter(libraryDir.absolutePath)
-                .substringBeforeLast("/"),
+            location = opfResource.uri.path.substringBeforeLast("/"),
             cover = J(doc).find("reference")?.attr("type") == "cover"
         )
     }
 
     private fun createOpfCacheIfRequired() {
         if (!opfCache.exists()) {
-            val filesCache: String = libraryDir.walkTopDown().filter { file ->
-                file.isFile && file.name.endsWith(OPF_EXTENSION)
-            }.map { file ->
-                file.absolutePath
+            val filesCache: String = store.list().filter { resource ->
+                resource.endsWith(OPF_EXTENSION)
             }.joinToString("\n")
 
             opfCache.writeText(filesCache)

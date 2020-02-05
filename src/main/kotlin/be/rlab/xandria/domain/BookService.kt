@@ -61,15 +61,17 @@ class BookService(
             }.forEach { result ->
                 val book: Book = result.book
 
-                logger.info("saving and indexing: ${book.author.name} - ${book.title}")
+                logger.info("saving book: ${book.author.name} - ${book.title}")
                 bookDAO.save(book)
                 scanResultDAO.save(result)
             }
 
+            logger.info("indexing")
             bookDAO.list().forEach { book ->
                 bookIndex.index(book)
             }
             bookIndex.sync()
+            logger.info("scan finished")
         }
     }
 

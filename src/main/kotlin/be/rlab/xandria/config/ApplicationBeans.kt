@@ -10,6 +10,7 @@ import be.rlab.xandria.index.BookScanner
 import be.rlab.xandria.index.ScanResultDAO
 import be.rlab.xandria.index.ScanResults
 import be.rlab.xandria.store.BookStoreService
+import be.rlab.xandria.store.ZipStore
 import be.rlab.xandria.store.FileSystemStore
 import com.typesafe.config.Config
 import org.springframework.context.support.beans
@@ -29,7 +30,18 @@ object ApplicationBeans {
 
         // Store
         bean {
-            FileSystemStore(libraryDir = File(config.getString("app.library-dir")))
+            val location: String = config.getString("app.library-location")
+            val protocol: String = location.substringBefore("://")
+            val path: String = location.substringAfter("://")
+
+            when (protocol) {
+                "file" ->
+                    FileSystemStore(libraryDir = File(path))
+                "zip" ->
+                    ZipStore(zipFile = File(path))
+                else ->
+                    throw RuntimeException("protocol not supported: $protocol")
+            }
         }
         bean {
             BookStoreService(
@@ -53,8 +65,8 @@ object ApplicationBeans {
         }
         bean {
             BookScanner(
-                libraryDir = File(config.getString("app.library-dir")),
-                workingDir = File(config.getString("app.working-dir"))
+                workingDir = File(config.getString("app.working-dir")),
+                store = ref()
             )
         }
     }

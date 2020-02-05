@@ -2,6 +2,7 @@ package be.rlab.xandria.index
 
 import be.rlab.nlp.model.Language
 import be.rlab.search.IndexManager
+import be.rlab.xandria.store.FileSystemStore
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -20,7 +21,7 @@ class BookIndexTest {
 
     @Test
     fun scanAndIndex() {
-        val scanner = BookScanner(libraryDir, workingDir)
+        val scanner = BookScanner(FileSystemStore(libraryDir), workingDir)
         val index = BookIndex(indexManager)
         index.index(scanner.scan { true }.toList().single().book)
         index.sync()

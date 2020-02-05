@@ -1,6 +1,7 @@
 package be.rlab.xandria.index
 
 import be.rlab.nlp.model.Language
+import be.rlab.xandria.store.FileSystemStore
 import org.joda.time.DateTime
 import org.junit.Test
 import java.io.File
@@ -11,7 +12,7 @@ class BookScannerTest {
 
     @Test
     fun scan() {
-        val reader = BookScanner(libraryDir, workingDir)
+        val reader = BookScanner(FileSystemStore(libraryDir), workingDir)
         reader.scan { true }.forEach { result ->
             val book = result.book
 
