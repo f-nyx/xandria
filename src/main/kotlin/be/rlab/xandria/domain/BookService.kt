@@ -62,17 +62,23 @@ class BookService(
                 val book: Book = result.book
 
                 logger.info("saving book: ${book.author.name} - ${book.title}")
-                bookDAO.save(book)
+
+                if (bookDAO.save(book)) {
+                    // First-pass indexing. If the book is created, it adds the book to
+                    // the index to make it available in real time.
+                    bookIndex.index(book)
+                }
+
                 scanResultDAO.save(result)
             }
-
-            logger.info("indexing")
-            bookDAO.list().forEach { book ->
-                bookIndex.index(book)
-            }
-            bookIndex.sync()
-            logger.info("scan finished")
         }
+
+        logger.info("indexing")
+        bookDAO.list().forEach { book ->
+            bookIndex.index(book)
+        }
+        bookIndex.sync()
+        logger.info("scan finished")
     }
 
     private fun serialize(

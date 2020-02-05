@@ -7,6 +7,7 @@ import be.rlab.search.model.Cursor
 import be.rlab.search.model.Document
 import be.rlab.search.model.SearchResult
 import be.rlab.xandria.domain.model.Book
+import be.rlab.xandria.index.model.Fields
 import be.rlab.xandria.support.BookId
 
 /** Manages the index to search for books.
@@ -21,7 +22,7 @@ class BookIndex(
         const val FIELD_TITLE: String = "title"
         const val FIELD_DESCRIPTION: String = "description"
         const val FIELD_CATEGORY: String = "category"
-        const val FIELD_AUTHOR_NAME: String = "author_name"
+        const val FIELD_AUTHOR_NAME: String = "author"
         const val FIELD_AUTHOR_ID: String = "author_id"
     }
 
@@ -45,21 +46,25 @@ class BookIndex(
                 int(FIELD_HASH, bookId) {
                     store(true)
                 }
-                text(FIELD_TITLE, book.title) {
-                    store(false)
-                }
-                text(FIELD_DESCRIPTION, book.description) {
-                    store(false)
-                }
-                text(FIELD_AUTHOR_NAME, book.author.name) {
-                    store(false)
-                }
+
                 string(FIELD_AUTHOR_ID, book.author.id.toString()) {
                     store(false)
                 }
-                book.categories.forEach { category ->
-                    text(FIELD_CATEGORY, category) {
+
+                Fields.translations.forEach { (_, fields) ->
+                    text(fields.getValue(FIELD_TITLE), book.title) {
                         store(false)
+                    }
+                    text(fields.getValue(FIELD_DESCRIPTION), book.description) {
+                        store(false)
+                    }
+                    text(fields.getValue(FIELD_AUTHOR_NAME), book.author.name) {
+                        store(false)
+                    }
+                    book.categories.forEach { category ->
+                        text(fields.getValue(FIELD_CATEGORY), category) {
+                            store(false)
+                        }
                     }
                 }
             }

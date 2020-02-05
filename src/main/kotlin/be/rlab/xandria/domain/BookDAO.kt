@@ -43,7 +43,7 @@ class BookDAO : TransactionSupport() {
         }
     }
 
-    fun save(book: Book): Book = transaction {
+    fun save(book: Book): Boolean = transaction {
         val bookHash: Int = BookId.generate(book)
         val results = BooksEntity.find {
             Books.hash eq bookHash
@@ -54,9 +54,10 @@ class BookDAO : TransactionSupport() {
                 hash = bookHash
                 data = objectMapper.writeValueAsString(book)
             }
+            true
+        } else {
+            false
         }
-
-        book
     }
 
     fun deleteAll() = transaction {
