@@ -5,7 +5,7 @@
     <groupId>be.rlab</groupId>
     <artifactId>xandria</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
 
     <properties>
         <!-- Maven -->
@@ -229,7 +229,7 @@
         <connection>scm:git:git@github.com:f-nyx/xandria.git</connection>
         <developerConnection>scm:git:git@github.com:f-nyx/xandria.git</developerConnection>
         <url>https://github.com/f-nyx/xandria</url>
-      <tag>HEAD</tag>
+      <tag>xandria-1.0.2</tag>
   </scm>
 
     <distributionManagement>
