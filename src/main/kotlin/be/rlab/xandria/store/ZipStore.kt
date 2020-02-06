@@ -5,7 +5,6 @@ import org.apache.commons.compress.archivers.zip.ZipFile
 import org.springframework.core.io.Resource
 import java.io.File
 import java.net.URLDecoder
-import java.nio.charset.Charset
 
 class ZipStore(
     private val zipFile: File
@@ -19,7 +18,7 @@ class ZipStore(
     }
 
     override fun list(): Sequence<String> {
-        val entries = archive.entries.asIterator()
+        val entries = archive.entries.iterator()
 
         return generateSequence {
             if (entries.hasNext()) {
@@ -42,14 +41,13 @@ class ZipStore(
 
     override fun read(id: String): Resource {
         val path = try {
-            URLDecoder.decode(id, Charset.defaultCharset())
+            URLDecoder.decode(id, "utf-8")
         } catch (cause: Exception) {
             id
         }
         val entry = archive.getEntry(path)
             ?: throw RuntimeException("entry not found: $path")
-
-        return ZipResource(archive.getInputStream(entry), path)
+        return ZipResource(archive.getInputStream(entry).readBytes(), path)
     }
 
     override fun close() {

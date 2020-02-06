@@ -6,7 +6,6 @@ import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.Resource
 import java.io.File
 import java.net.URLDecoder
-import java.nio.charset.Charset
 
 class FileSystemStore(
     private val libraryDir: File
@@ -46,7 +45,7 @@ class FileSystemStore(
         logger.info("reading resouce: $id")
 
         val path = try {
-            URLDecoder.decode(id, Charset.defaultCharset())
+            URLDecoder.decode(id, "utf-8")
         } catch (cause: Exception) {
             id
         }
