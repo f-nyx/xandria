@@ -57,7 +57,8 @@ object ApplicationBeans {
                 bookDAO = ref(),
                 scanResultDAO = ref(),
                 scanner = ref(),
-                scanEnabled = config.getBoolean("app.scan-enabled")
+                scanEnabled = config.getBoolean("app.scan-enabled"),
+                indexingEnabled = config.getBoolean("app.indexing-enabled")
             )
         }
         bean {

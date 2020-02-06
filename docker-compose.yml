@@ -18,6 +18,9 @@ services:
       - app_working_dir
       - app_service_url
       - app_scan_enabled
+      - app_indexing_enabled
+    volumes:
+      - ./data:/opt/data:rw
   h2:
     image: "oscarfonts/h2"
     restart: unless-stopped

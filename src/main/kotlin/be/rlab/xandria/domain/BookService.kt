@@ -19,7 +19,8 @@ class BookService(
     private val bookDAO: BookDAO,
     private val scanResultDAO: ScanResultDAO,
     private val scanner: BookScanner,
-    private val scanEnabled: Boolean
+    private val scanEnabled: Boolean,
+    private val indexingEnabled: Boolean
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(BookService::class.java)
@@ -63,21 +64,19 @@ class BookService(
 
                 logger.info("saving book: ${book.author.name} - ${book.title}")
 
-                if (bookDAO.save(book)) {
-                    // First-pass indexing. If the book is created, it adds the book to
-                    // the index to make it available in real time.
-                    bookIndex.index(book)
-                }
-
+                bookDAO.save(book)
                 scanResultDAO.save(result)
             }
         }
 
-        logger.info("indexing")
-        bookDAO.list().forEach { book ->
-            bookIndex.index(book)
+        if (indexingEnabled) {
+            logger.info("indexing")
+            bookDAO.list().forEach { book ->
+                bookIndex.index(book)
+            }
+            bookIndex.sync()
         }
-        bookIndex.sync()
+
         logger.info("scan finished")
     }
 
