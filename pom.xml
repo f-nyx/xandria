@@ -23,7 +23,7 @@
 
         <!-- Web -->
         <netty.version>0.9.4.RELEASE</netty.version>
-        <springframework.all.version>5.2.3.RELEASE</springframework.all.version>
+        <springframework.all.version>5.2.20.RELEASE</springframework.all.version>
 
         <kotlin.version>1.3.61</kotlin.version>
         <kotlin-coroutines.version>1.3.2</kotlin-coroutines.version>
